@@ -1,0 +1,6 @@
+{
+    "require": {
+        "maika-kanaka/ci3-eloquent": "^1.1",
+        "chriskacerguis/codeigniter-restserver": "^3.1"
+    }
+}

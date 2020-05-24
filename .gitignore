@@ -1,5 +1,8 @@
 .DS_Store
 
+application/config/production/*
+!application/config/production/index.html
+
 application/cache/*
 !application/cache/index.html
 
@@ -7,6 +10,8 @@ application/logs/*
 !application/logs/index.html
 
 !application/*/.htaccess
+
+application/vendor/
 
 composer.lock
 
