@@ -1,5 +1,6 @@
 {
     "require": {
-        "maika-kanaka/ci3-eloquent": "^1.1"
+        "maika-kanaka/ci3-eloquent": "^1.1",
+        "firebase/php-jwt": "^5.2"
     }
 }
