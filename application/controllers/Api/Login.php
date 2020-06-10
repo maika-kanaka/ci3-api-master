@@ -61,12 +61,15 @@ class Login extends MY_Controller
             exit;
         }
 
+        $now = new \DateTime();
+        $now->setTimezone(new \DateTimeZone("Asia/Jakarta"));
         $key = $this->config->item("jwt_key");
         $payload = array(
             "iss" => "http://example.org",
             "aud" => "http://example.com",
-            "iat" => 1356999524,
-            "nbf" => 1357000000
+            "iat" => $now->getTimestamp(),
+            "nbf" => $now->getTimestamp(),
+            "user_id" => $user->user_id
         );
 
         $jwt = JWT::encode($payload, $key);
