@@ -21,7 +21,7 @@ class MY_Controller extends CI_Controller
 		
 		parent::__construct();
 
-		// auth for api with jwt
+		// auth login for api with jwt
 		if( strpos(uri_string(), "api") !== false )
 		{
 			// except url 

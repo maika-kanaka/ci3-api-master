@@ -72,6 +72,14 @@ class Migration_User extends CI_Migration
             'group_id' => 1 // root
         ]);
 
+        $this->db->insert('system_users', [
+			'user_fullname' => 'User',
+			'user_email' => 'user@gmail.com',
+            'user_name' => 'user',
+            'user_password' => password_hash('123456', PASSWORD_DEFAULT),
+            'group_id' => 2 // user
+        ]);
+
         ## TABLE: system_menus
         $this->dbforge->add_field(array(
             'menu_id' => array(
@@ -103,6 +111,14 @@ class Migration_User extends CI_Migration
         $this->dbforge->create_table('system_menus');
 
         $this->db->insert_batch('system_menus', [
+            [
+                'menu_id' => 'dashboard',
+                'menu_id_top' => NULL,
+                'menu_name' => 'Dashboard',
+                'menu_order' => 0,
+                'is_active' => 'Y'
+            ],
+
             [
                 'menu_id' => 'system',
                 'menu_id_top' => NULL,
@@ -156,6 +172,12 @@ class Migration_User extends CI_Migration
             'is_active' => 'Y'
         ]);
 
+        $this->db->insert('system_user_group', [
+            'group_id' => 2,
+            'group_name' => 'User',
+            'is_active' => 'Y'
+        ]);
+
         ## TABLE: system_user_group_access
         $this->dbforge->add_field(array(
             'group_id' => array(
@@ -177,11 +199,19 @@ class Migration_User extends CI_Migration
         $this->dbforge->add_key('menu_id', True);
         $this->dbforge->create_table('system_user_group_access');
 
+        # hak akses superadmin
         $this->db->query("
             INSERT INTO system_user_group_access
             SELECT 1, menu_id, 'Y'
             FROM system_menus 
         ");
+
+        # hak akses user 
+        $this->db->insert('system_user_group_access', [
+            'group_id' => 2,
+            'menu_id' => 'dashboard',
+            'can_access' => 'Y'
+        ]);
 
         ## TABLE: system_user_log
         $this->dbforge->add_field(array(

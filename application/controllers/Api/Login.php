@@ -7,7 +7,8 @@ class Login extends MY_Controller
 
 	public function __construct()
 	{
-		parent::__construct();
+        parent::__construct();
+        $this->load->model('Sys/User_group_access_model');
 	}
 
 	public function index()
@@ -61,6 +62,9 @@ class Login extends MY_Controller
             exit;
         }
 
+        # data again 
+        $pageAccess = $this->User_group_access_model->initSession($user->group_id);
+
         $now = new \DateTime();
         $now->setTimezone(new \DateTimeZone("Asia/Jakarta"));
         $key = $this->config->item("jwt_key");
@@ -78,6 +82,7 @@ class Login extends MY_Controller
         echo json_encode([
             'data' => [
                 'user' => $user,
+                'pageAccess' => $pageAccess,
                 'jwt' => $jwt
             ],
             'errors' => null
