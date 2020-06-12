@@ -78,6 +78,8 @@ class Login extends MY_Controller
 
         $jwt = JWT::encode($payload, $key);
 
+        unset($user->user_password);
+
         # lempar 
         echo json_encode([
             'data' => [
