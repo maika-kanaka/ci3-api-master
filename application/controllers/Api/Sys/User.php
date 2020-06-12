@@ -128,7 +128,9 @@ class User extends My_Controller
             }
 		}
 
-		$update['user_fullname'] = trim($input->user_fullname);
+		if(!empty($input->user_fullname)){
+			$update['user_fullname'] = trim($input->user_fullname);
+		}
 
 		# update 
 		$this->User_model->update(['user_id' => $this->current_user->user_id], $update);
