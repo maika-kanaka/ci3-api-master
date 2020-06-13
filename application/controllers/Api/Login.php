@@ -17,13 +17,15 @@ class Login extends MY_Controller
         $input     = json_decode($raw_input);
         
         # param
-        $email    = trim( $input->email );
+        $email_or_username = trim( $input->email_or_username );
         $password = trim( $input->password );
 
         # data 
-        $user = $this->User_model->find([
-            'user_email' => $email
-        ]);
+		$user = $this->User_model
+						->table()
+						->where('user_email', $email_or_username)
+						->or_where('user_name', $email_or_username)
+						->get()->row();
 
         # valid 
         if( empty($user) ){
