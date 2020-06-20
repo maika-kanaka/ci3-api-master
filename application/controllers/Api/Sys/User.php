@@ -47,12 +47,34 @@ class User extends My_Controller
 		$input = json_decode($raw_input);
 
 		$not_duplicat_email = true;
-		if( trim($this->current_user->user_email) != trim($input->user_email) )
+
+		if( $input->page == 'profile' )
+		{
+			if( trim($this->current_user->user_email) != trim($input->user_email) )
+			{
+				$query_email = $this->User_model->find(['user_email' => trim($input->user_email)]);
+				if(!empty($query_email)){
+					$not_duplicat_email = false;	
+				}
+			}
+		}
+		else if( $input->page == 'add' )
 		{
 			$query_email = $this->User_model->find(['user_email' => trim($input->user_email)]);
 			if(!empty($query_email)){
 				$not_duplicat_email = false;	
 			}
+		}
+		else if( $input->page == 'edit' )
+		{
+			$user_before = $this->User_model->find(['user_id' => trim($input->user_id)]);
+
+            if (trim($user_before->user_email) != trim($input->user_email)) {
+                $query_email = $this->User_model->find(['user_email' => trim($input->user_email)]);
+                if (!empty($query_email)) {
+                    $not_duplicat_email = false;
+                }
+            }
 		}
 
 		echo json_encode([
@@ -68,13 +90,34 @@ class User extends My_Controller
 		$input = json_decode($raw_input);
 
 		$not_duplicat_username = true;
-		if ( trim($this->current_user->user_name) != trim($input->user_name) ) 
+		if( $input->page == 'profile' )
+		{
+			if ( trim($this->current_user->user_name) != trim($input->user_name) ) 
+			{
+				$query_username = $this->User_model->find(['user_name' => trim($input->user_name)]);
+				if(!empty($query_username)){
+					$not_duplicat_username = false;	
+				}
+			}
+		}
+		else if( $input->page == 'add' )
 		{
 			$query_username = $this->User_model->find(['user_name' => trim($input->user_name)]);
 			if(!empty($query_username)){
 				$not_duplicat_username = false;	
 			}
-        }
+		}
+		else if( $input->page == 'edit' )
+		{
+			$user_before = $this->User_model->find(['user_id' => trim($input->user_id)]);
+
+            if (trim($user_before->user_name) != trim($input->user_name)) {
+                $query_username = $this->User_model->find(['user_name' => trim($input->user_name)]);
+                if (!empty($query_username)) {
+                    $not_duplicat_username = false;
+                }
+            }
+		}		
 
 		echo json_encode([
 			'ok' => $not_duplicat_username
@@ -191,6 +234,64 @@ class User extends My_Controller
 		exit;
 	}
 
+	public function update()
+	{
+		# param 
+		$raw_input = file_get_contents("php://input");
+		$input = json_decode($raw_input);
+
+		# vali d
+		if( empty($input->user_id) )
+		{
+			show_404();
+			return;
+		}
+
+		# data sebelum
+		$user_id = $input->user_id;
+		$data_before = $this->User_model->find(['user_id' => $user_id]);
+		
+		# tangkap input 
+		$insert = $this->_get_input('edit');
+
+		# valid: email
+		if( trim($data_before->user_email) != trim($insert['user_email']) )
+		{
+			$duplicat = $this->User_model->find(['user_email' => $insert['user_email']]);
+			if (!empty($duplicat)) {
+				echo json_encode([
+					'errors' => ['Surel <b> '. $insert['user_email'] . ' </b> sudah dipakai.']
+				]);
+				set_status_header(403);
+				exit;
+			}
+		}
+
+		# valid: username
+		if (trim($data_before->user_name) != trim($insert['user_name'])) 
+		{
+            $duplicat = $this->User_model->find(['user_name' => $insert['user_name']]);
+            if (!empty($duplicat)) {
+                echo json_encode([
+                    'errors' => ['Nama pengguna <b> '. $insert['user_name'] . ' </b> sudah dipakai.']
+                ]);
+                set_status_header(403);
+                exit;
+            }
+        }
+
+		# proses simpan
+		$this->User_model->update(['user_id' => $user_id], $insert);
+
+		# lempar
+		echo json_encode([
+			'data' => null,
+			'errors' => null
+		]);
+		set_status_header(200);
+		exit;
+	}
+
 	private function _get_input($event = 'add', $param = [])
 	{
 		# param 
@@ -200,13 +301,17 @@ class User extends My_Controller
 		if( $event == 'add' ) {
 			$insert['created_at'] = date('Y-m-d H:i:s');
 			$insert['created_by'] = $this->current_user->user_id;
+			$insert['user_password'] = password_hash($input->user_password, PASSWORD_DEFAULT);
+		}else if($event == 'edit'){
+			if(!empty($input->user_password)){
+				$insert['user_password'] = password_hash($input->user_password, PASSWORD_DEFAULT);
+			}
 		}
 
 		$insert['group_id'] = (int) $input->group_id;
 		$insert['user_fullname'] = trim(strip_tags(substr($input->user_fullname ,0, 160)));
 		$insert['user_name'] = trim(strip_tags(substr($input->user_name, 0, 50)));
 		$insert['user_email'] = trim(strip_tags(substr($input->user_email, 0, 220)));
-		$insert['user_password'] = password_hash($input->user_password, PASSWORD_DEFAULT);
 		$insert['is_block'] = $input->is_block == 'N' ? 'N' : 'Y';
 		
 		return $insert;
