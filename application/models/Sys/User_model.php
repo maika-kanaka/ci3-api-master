@@ -13,6 +13,7 @@ class User_model extends Eloquent
 		parent::__construct();
 
 		$this->load->model('Sys/User_group_model');
+		$this->load->model('Sys/User_group_access_model');
 	}
 
 	public function view()

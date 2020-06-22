@@ -9,6 +9,8 @@ class Group extends My_Controller
 		parent::__construct();
 
 		$this->load->model('Sys/User_group_access_model');
+
+		$this->auth->canAccessApi('system_user_group');
 	}
 
 	public function data()

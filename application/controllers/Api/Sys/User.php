@@ -7,6 +7,8 @@ class User extends My_Controller
 	public function __construct()
 	{		
 		parent::__construct();
+
+		$this->auth->canAccessApi('system_users');
 	}
 
 	public function data()

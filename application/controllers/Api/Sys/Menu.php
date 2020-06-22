@@ -9,6 +9,8 @@ class Menu extends My_Controller
 		parent::__construct();
 
 		$this->load->model('Sys/Menu_model');
+
+		$this->auth->canAccessApi('system_user_group');
 	}
 
 	public function data_for_page_access()
