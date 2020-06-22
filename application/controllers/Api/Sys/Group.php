@@ -113,4 +113,44 @@ class Group extends My_Controller
 			'menus' => $insert_menus
 		);
 	}
+
+	public function delete()
+	{
+		# param 
+		$raw_input = file_get_contents("php://input");
+		$input = json_decode($raw_input);
+
+		# valid 
+		if(empty($input->id_trx)){
+			echo json_encode([
+				'errors' => ['ID Trx empty']
+			]);
+			set_status_header(403);
+			exit;
+		}
+
+		# get val 
+		$id = $input->id_trx;
+		
+		# proses 
+		$this->db->trans_start();
+			$this->db->delete(
+				$this->User_group_model->table,
+				['group_id' => $id]
+			);
+
+			$this->db->delete(
+				$this->User_group_access_model->table,
+				['group_id' => $id]
+			);
+		$this->db->trans_complete();
+
+		# lempar
+		echo json_encode([
+			'data' => null,
+			'errors' => null
+		]);
+		set_status_header(200);
+		exit;
+	}
 }
